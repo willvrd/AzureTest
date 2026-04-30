@@ -8,3 +8,5 @@ This repository serves as a testing environment to implement a full **CI/CD** pi
 * **Frontend:** Custom HTML5/CSS3 templates.
 * **Cloud Infrastructure:** Azure App Service
 * **Automation:** GitHub Actions with OIDC Authentication.
+
+:)
