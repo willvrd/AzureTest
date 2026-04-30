@@ -10,10 +10,16 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAsync()
         {
-            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Layouts", "index.html");
-            string htmlContent = await System.IO.File.ReadAllTextAsync(filePath);
+           
+            string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Home");
 
-            return Content(htmlContent, "text/html", System.Text.Encoding.UTF8);
+            string htmlContent = await System.IO.File.ReadAllTextAsync(Path.Combine(folderPath, "index.html"));
+            string cssContent = await System.IO.File.ReadAllTextAsync(Path.Combine(folderPath, "styles.css"));
+
+            string finalHtml = htmlContent.Replace("{{STYLES}}", cssContent);
+
+           
+            return Content(finalHtml, "text/html", System.Text.Encoding.UTF8);
         }
     }
 }
