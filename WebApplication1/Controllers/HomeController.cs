@@ -8,7 +8,7 @@ namespace WebApplication1.Controllers
     {
        
         [HttpGet]
-        public async Task<IActionResult> GetAsync()
+        public async Task<IActionResult> Index()
         {
            
             string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Home");
