@@ -13,7 +13,8 @@ namespace WebApplication1.Entities
         [MaxLength(200)]
         public string Title { get; set; } = string.Empty;
 
-        [Required]
+        //[Required]
+        [Required(ErrorMessage = "El content es obligatorio.")]
         public string Content { get; set; } = string.Empty;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

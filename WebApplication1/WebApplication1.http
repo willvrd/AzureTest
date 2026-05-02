@@ -4,3 +4,19 @@ GET {{WebApplication1_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+# POSTS
+
+//INDEX
+GET {{WebApplication1_HostAddress}}/api/posts
+Accept: application/json
+
+//CREATE
+### Crear un nuevo Post
+POST {{WebApplication1_HostAddress}}/api/posts
+Content-Type: application/json
+
+{
+  "title": "Post 2",
+  "content": "Esto es una prueba 2"
+}
