@@ -10,5 +10,7 @@ namespace WebApplication1.DTOs
 
         [Required(ErrorMessage = "El contenido es obligatorio.")]
         public string Content { get; set; } = string.Empty;
+
+        public IFormFile? Image { get; set; }
     }
 }
