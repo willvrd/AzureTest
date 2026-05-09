@@ -20,5 +20,7 @@ namespace WebApplication1.Entities
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public bool IsPublished { get; set; } = false;
+
+        public string? ImageUrl { get; set; }
     }
 }
