@@ -5,6 +5,10 @@ using WebApplication1.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//Check Enviroment
+var env = builder.Environment.EnvironmentName;
+Console.WriteLine($"*** ENVIROMENT: {env} ***");
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -31,7 +35,7 @@ builder.Services.AddScoped<IStorageService, BlobStorageService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
 {
     app.MapOpenApi();
 }
