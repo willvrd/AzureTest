@@ -365,3 +365,4 @@ FodyWeavers.xsd
 # Ignore AppSettings
 [Aa]ppsettings.json
 [Aa]ppsettings.Development.json
+[Aa]ppsettings.Staging.json
