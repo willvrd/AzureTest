@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
-using WebApplication1.DTOs;
+using WebApplication1.DTOs.Post;
 using WebApplication1.Entities;
+using WebApplication1.Extensions;
 using WebApplication1.Services.Interfaces;
 
 namespace WebApplication1.Controllers
@@ -11,55 +12,34 @@ namespace WebApplication1.Controllers
     [Route("api/[controller]")]
     public class PostsController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IStorageService _blobStorageService;
-        private readonly IConfiguration _configuration;
+        private readonly IPostService _postService;
 
-        public PostsController(ApplicationDbContext context, IStorageService blobStorageService, IConfiguration configuration)
+        public PostsController(IPostService postService)
         {
-            _context = context;
-            _blobStorageService = blobStorageService;
-            _configuration = configuration;
+            _postService = postService;
         }
 
         /*
          * Index
          */
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Post>>> Index()
+        public async Task<ActionResult<IEnumerable<PostResponseDto>>> Index()
         {
-            return await _context.Posts.ToListAsync();
+            var posts = await _postService.Index();
+            return Ok(posts);
         }
 
         /*
-         * Create
-         */
+        * Create
+        */
         [HttpPost]
-        public async Task<ActionResult<Post>> PostPost([FromForm] PostDto postDto)
+        public async Task<ActionResult<PostResponseDto>> Create([FromForm] PostCreateDto postDto)
         {
-            string? imageUrl = null;
-
-            if (postDto.Image != null && postDto.Image.Length > 0)
-            {
-               
-                string containerName = _configuration["BlobContainers:PostImages"] ?? "images";
-
-                imageUrl = await _blobStorageService.UploadFileAsync(postDto.Image, containerName, "posts");
-            }
-
-            var post = new Post
-            {
-                Title = postDto.Title,
-                Content = postDto.Content,
-                ImageUrl = imageUrl,
-                CreatedAt = DateTime.UtcNow,
-                IsPublished = false
-            };
-
-            _context.Posts.Add(post);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(Index), new { id = post.Id }, post);
+            var response = await _postService.Create(postDto);
+            return CreatedAtAction(nameof(Index), new { id = response.Id }, response);
         }
+
     }
+
+
 }

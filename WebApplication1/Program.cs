@@ -31,6 +31,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 //Services
 builder.Services.AddScoped<IStorageService, BlobStorageService>();
+builder.Services.AddScoped<IPostService, PostService>();
 
 var app = builder.Build();
 

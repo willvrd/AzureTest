@@ -1,0 +1,81 @@
+﻿using Microsoft.EntityFrameworkCore;
+using WebApplication1.Data;
+using WebApplication1.DTOs.Post;
+using WebApplication1.Entities;
+using WebApplication1.Extensions;
+using WebApplication1.Services.Interfaces;
+
+namespace WebApplication1.Services
+{
+    public class PostService : IPostService
+    {
+        private readonly ApplicationDbContext _context;
+        private readonly IStorageService _storageService;
+        private readonly IConfiguration _config;
+        private readonly string _containerName;
+
+        public PostService(ApplicationDbContext context, IStorageService storageService, IConfiguration config)
+        {
+            _context = context;
+            _storageService = storageService;
+            _config = config;
+            
+            _containerName = _config["BlobContainers:ContainerName"] ?? "images";
+        }
+
+        /*
+         * Index - Get All Data
+         */
+        public async Task<IEnumerable<PostResponseDto>> Index()
+        {
+            var posts = await _context.Posts.ToListAsync();
+            //Map Final Data
+            return posts.Select(p => MapToResponseDto(p, _config));
+        }
+
+        /*
+        * Create an Item
+        */
+        public async Task<PostResponseDto> Create(PostCreateDto postDto)
+        {
+            string? relativePath = null;
+
+            if (postDto.Image != null && postDto.Image.Length > 0)
+            {
+                relativePath = await _storageService.UploadFileAsync(postDto.Image, _containerName, "posts");
+            }
+
+            var post = new Post
+            {
+                Title = postDto.Title,
+                Content = postDto.Content,
+                ImageRelativePath = relativePath,
+                CreatedAt = DateTime.UtcNow,
+                IsPublished = false
+            };
+
+            _context.Posts.Add(post);
+            await _context.SaveChangesAsync();
+
+            //Map Final Data
+            return MapToResponseDto(post,_config);
+        }
+
+        /*
+         * Map data to Response
+         */
+        private static PostResponseDto MapToResponseDto(Post post, IConfiguration config)
+        {
+            return new PostResponseDto
+            {
+                Id = post.Id,
+                Title = post.Title,
+                Content = post.Content,
+                CreatedAt = post.CreatedAt,
+                IsPublished = post.IsPublished,
+                ImageRelativePath = post.ImageRelativePath,
+                ImageFullUrl = post.ImageRelativePath.ToFullUrl(config)
+            };
+        }
+    }
+}
