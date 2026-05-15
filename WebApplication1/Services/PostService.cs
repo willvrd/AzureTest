@@ -19,7 +19,7 @@ namespace WebApplication1.Services
             _context = context;
             _storageService = storageService;
             _config = config;
-            
+
             _containerName = _config["BlobContainers:ContainerName"] ?? "images";
         }
 
@@ -45,20 +45,34 @@ namespace WebApplication1.Services
                 relativePath = await _storageService.UploadFileAsync(postDto.Image, _containerName, "posts");
             }
 
-            var post = new Post
+            try
             {
-                Title = postDto.Title,
-                Content = postDto.Content,
-                ImageRelativePath = relativePath,
-                CreatedAt = DateTime.UtcNow,
-                IsPublished = false
-            };
+                var post = new Post
+                {
+                    Title = postDto.Title,
+                    Content = postDto.Content,
+                    ImageRelativePath = relativePath,
+                    CreatedAt = DateTime.UtcNow,
+                    IsPublished = false
+                };
 
-            _context.Posts.Add(post);
-            await _context.SaveChangesAsync();
+                _context.Posts.Add(post);
+                await _context.SaveChangesAsync();
 
-            //Map Final Data
-            return MapToResponseDto(post,_config);
+                //Map Final Data
+                return MapToResponseDto(post, _config);
+            }
+            catch (Exception ex)
+            {
+                // Delete Image if some fails
+                if (!string.IsNullOrEmpty(relativePath))
+                {
+                    await _storageService.DeleteFileAsync(relativePath, _containerName);
+                }
+
+                // Important: Re-lanzamos el error para que el GlobalExceptionHandler lo capture
+                throw;
+            }
         }
 
         /*
