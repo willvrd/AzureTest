@@ -21,6 +21,6 @@ namespace WebApplication1.Entities
 
         public bool IsPublished { get; set; } = false;
 
-        public string? ImageUrl { get; set; }
+        public string? ImageRelativePath { get; set; }
     }
 }
