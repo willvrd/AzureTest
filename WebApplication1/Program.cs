@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
+using WebApplication1.Middlewares.Handlers;
 using WebApplication1.Services;
 using WebApplication1.Services.Interfaces;
 
@@ -14,6 +15,12 @@ Console.WriteLine($"*** ENVIROMENT: {env} ***");
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+// IMPORTANTE: Agregar ProblemDetails primero | Exception Global Handler
+builder.Services.AddProblemDetails();
+
+//Registrar Exceptions | Exception Global Handler
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 // Obtener la cadena de conexión de appsettings.json
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -40,6 +47,9 @@ if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
 {
     app.MapOpenApi();
 }
+
+//Exception Global Handler
+app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
 
