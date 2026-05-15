@@ -33,6 +33,7 @@ public class BlobStorageService : IStorageService
             await blobClient.UploadAsync(stream, options);
         }
 
-        return blobClient.Uri.ToString();
+        //return blobClient.Uri.ToString(); //ruta completa
+        return fileName;
     }
 }
