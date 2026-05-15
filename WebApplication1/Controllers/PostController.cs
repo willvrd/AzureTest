@@ -30,6 +30,22 @@ namespace WebApplication1.Controllers
         }
 
         /*
+         * Find
+         */
+        [HttpGet("{id}")]
+        public async Task<ActionResult<PostResponseDto>> Find(int id)
+        {
+            var post = await _postService.Find(id);
+
+            if (post == null)
+            {
+                return NotFound(new { message = $"Item with ID {id} was not found." });
+            }
+
+            return Ok(post);
+        }
+
+        /*
         * Create
         */
         [HttpPost]

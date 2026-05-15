@@ -94,6 +94,18 @@ namespace WebApplication1.Services
         }
 
         /*
+         * Find - Get a single Item by ID
+         */
+        public async Task<PostResponseDto?> Find(int id)
+        {
+            var post = await _context.Posts.FindAsync(id);
+            if (post == null) return null;
+
+            //Map DTO
+            return MapToResponseDto(post, _config);
+        }
+
+        /*
         * Delete a item and its Image
         */
         public async Task<bool> Delete(int id)
