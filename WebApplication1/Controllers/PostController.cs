@@ -26,7 +26,7 @@ namespace WebApplication1.Controllers
         public async Task<ActionResult<IEnumerable<PostResponseDto>>> Index()
         {
             var posts = await _postService.Index();
-            return Ok(posts);
+            return Ok(posts); //200
         }
 
         /*
@@ -37,6 +37,22 @@ namespace WebApplication1.Controllers
         {
             var response = await _postService.Create(postDto);
             return CreatedAtAction(nameof(Index), new { id = response.Id }, response);
+        }
+
+        /*
+        * Delete
+        */
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var result = await _postService.Delete(id);
+
+            if (!result)
+            {
+                return NotFound(new { message = $"Post with ID {id} not found" });
+            }
+
+            return NoContent(); //204
         }
 
     }

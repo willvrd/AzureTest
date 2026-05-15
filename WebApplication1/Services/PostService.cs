@@ -10,6 +10,7 @@ namespace WebApplication1.Services
     public class PostService : IPostService
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<PostService> _logger; //Logger with PostService
         private readonly IStorageService _storageService;
         private readonly IConfiguration _config;
         private readonly string _containerName;
@@ -21,6 +22,23 @@ namespace WebApplication1.Services
             _config = config;
 
             _containerName = _config["BlobContainers:ContainerName"] ?? "images";
+        }
+
+        /*
+         * Map data to Response
+         */
+        private static PostResponseDto MapToResponseDto(Post post, IConfiguration config)
+        {
+            return new PostResponseDto
+            {
+                Id = post.Id,
+                Title = post.Title,
+                Content = post.Content,
+                CreatedAt = post.CreatedAt,
+                IsPublished = post.IsPublished,
+                ImageRelativePath = post.ImageRelativePath,
+                ImageFullUrl = post.ImageRelativePath.ToFullUrl(config)
+            };
         }
 
         /*
@@ -76,20 +94,36 @@ namespace WebApplication1.Services
         }
 
         /*
-         * Map data to Response
-         */
-        private static PostResponseDto MapToResponseDto(Post post, IConfiguration config)
+        * Delete a item and its Image
+        */
+        public async Task<bool> Delete(int id)
         {
-            return new PostResponseDto
+            //Search Post
+            var post = await _context.Posts.FindAsync(id);
+
+            if (post == null) return false;
+
+            var imagePath = post.ImageRelativePath;
+
+            try
             {
-                Id = post.Id,
-                Title = post.Title,
-                Content = post.Content,
-                CreatedAt = post.CreatedAt,
-                IsPublished = post.IsPublished,
-                ImageRelativePath = post.ImageRelativePath,
-                ImageFullUrl = post.ImageRelativePath.ToFullUrl(config)
-            };
+                _context.Posts.Remove(post);
+                await _context.SaveChangesAsync();
+
+                //Delete File
+                if (!string.IsNullOrEmpty(imagePath))
+                {
+                    await _storageService.DeleteFileAsync(imagePath, _containerName);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting item {Id}", id);
+                throw; // GlobalExceptionHandler
+            }
         }
+
     }
 }
