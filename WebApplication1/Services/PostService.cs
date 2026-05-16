@@ -25,7 +25,7 @@ namespace WebApplication1.Services
         }
 
         /*
-         * Map data to Response
+         * Map data to Response | PostResponseDTO
          */
         private static PostResponseDto MapToResponseDto(Post post, IConfiguration config)
         {
@@ -103,6 +103,54 @@ namespace WebApplication1.Services
 
             //Map DTO
             return MapToResponseDto(post, _config);
+        }
+
+        /*
+        * Update an Item
+        */
+        public async Task<PostResponseDto?> Update(int id, PostUpdateDto postDto)
+        {
+            var post = await _context.Posts.FindAsync(id);
+            if (post == null) return null;
+
+            string? newRelativePath = null;
+            string? oldRelativePath = post.ImageRelativePath; //Save Old
+
+            try
+            {
+                //New Image
+                if (postDto.Image != null && postDto.Image.Length > 0)
+                {
+                    newRelativePath = await _storageService.UploadFileAsync(postDto.Image, _containerName, "posts");
+                    post.ImageRelativePath = newRelativePath;
+                }
+
+                //Update Attributes
+                post.Title = postDto.Title;
+                post.Content = postDto.Content;
+
+                _context.Posts.Update(post);
+                await _context.SaveChangesAsync();
+
+                //Delete Old Image
+                if (newRelativePath != null && !string.IsNullOrEmpty(oldRelativePath))
+                {
+                    await _storageService.DeleteFileAsync(oldRelativePath, _containerName);
+                }
+
+                return MapToResponseDto(post, _config);
+            }
+            catch (Exception ex)
+            {
+                //ROLLBACK: Si la BD falla pero ya habíamos subido la imagen nueva, la borramos
+                if (!string.IsNullOrEmpty(newRelativePath))
+                {
+                    await _storageService.DeleteFileAsync(newRelativePath, _containerName);
+                }
+
+                _logger.LogError(ex, "Error updating item {Id}", id);
+                throw;
+            }
         }
 
         /*
