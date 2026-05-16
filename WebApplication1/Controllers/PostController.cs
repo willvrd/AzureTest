@@ -56,6 +56,22 @@ namespace WebApplication1.Controllers
         }
 
         /*
+        * Update
+        */
+        [HttpPut("{id}")]
+        public async Task<ActionResult<PostResponseDto>> Update(int id, [FromForm] PostUpdateDto postDto)
+        {
+            var response = await _postService.Update(id, postDto);
+
+            if (response == null)
+            {
+                return NotFound(new { message = $"Item with ID {id} not found" });
+            }
+
+            return Ok(response);
+        }
+
+        /*
         * Delete
         */
         [HttpDelete("{id}")]
