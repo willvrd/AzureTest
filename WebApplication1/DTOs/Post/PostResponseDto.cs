@@ -7,5 +7,6 @@
         public bool IsPublished { get; set; }
         public string? ImageRelativePath { get; set; }
         public string? ImageFullUrl { get; set; }
+        public DateTime? UpdatedAt { get; set; }
     }
 }

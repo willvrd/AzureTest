@@ -113,6 +113,7 @@ namespace WebApplication1.Services
                 //Update Attributes
                 post.Title = postDto.Title;
                 post.Content = postDto.Content;
+                post.UpdatedAt = DateTime.UtcNow;
 
                 _context.Posts.Update(post);
                 await _context.SaveChangesAsync();

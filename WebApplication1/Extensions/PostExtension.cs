@@ -17,9 +17,10 @@ namespace WebApplication1.Extensions
                 Title = post.Title,
                 Content = post.Content,
                 CreatedAt = post.CreatedAt,
+                UpdatedAt = post.UpdatedAt,
                 IsPublished = post.IsPublished,
                 ImageRelativePath = post.ImageRelativePath,
-                ImageFullUrl = post.ImageRelativePath.ToFullUrl(config) //Att ersonalizado
+                ImageFullUrl = post.ImageRelativePath.ToFullUrl(config) //Att personalizado
             };
         }
 
