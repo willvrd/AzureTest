@@ -22,5 +22,7 @@ namespace WebApplication1.Entities
         public bool IsPublished { get; set; } = false;
 
         public string? ImageRelativePath { get; set; }
+
+        public DateTime? UpdatedAt { get; set; }
     }
 }
