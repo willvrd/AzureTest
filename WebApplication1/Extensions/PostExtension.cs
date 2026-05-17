@@ -1,4 +1,11 @@
-﻿using WebApplication1.DTOs.Post;
+﻿// -----------------------------------------------------------------------------
+// Author:      William Verde
+// Date:        2026
+// License:     MIT
+// Repository:  https://github.com/willvrd/AzureTest
+// -----------------------------------------------------------------------------
+
+using WebApplication1.DTOs.Post;
 using WebApplication1.Entities;
 
 namespace WebApplication1.Extensions

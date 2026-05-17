@@ -1,4 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿// -----------------------------------------------------------------------------
+// Author:      William Verde
+// Date:        2026
+// License:     MIT
+// Repository:  https://github.com/willvrd/AzureTest
+// -----------------------------------------------------------------------------
+
+using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
 using WebApplication1.DTOs.Post;
 using WebApplication1.Entities;
