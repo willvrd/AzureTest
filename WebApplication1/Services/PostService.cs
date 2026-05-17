@@ -24,23 +24,7 @@ namespace WebApplication1.Services
             _containerName = _config["BlobContainers:ContainerName"] ?? "images";
         }
 
-        /*
-         * Map data to Response | PostResponseDTO
-         */
-        private static PostResponseDto MapToResponseDto(Post post, IConfiguration config)
-        {
-            return new PostResponseDto
-            {
-                Id = post.Id,
-                Title = post.Title,
-                Content = post.Content,
-                CreatedAt = post.CreatedAt,
-                IsPublished = post.IsPublished,
-                ImageRelativePath = post.ImageRelativePath,
-                ImageFullUrl = post.ImageRelativePath.ToFullUrl(config)
-            };
-        }
-
+        
         /*
          * Index - Get All Data
          */
@@ -48,7 +32,19 @@ namespace WebApplication1.Services
         {
             var posts = await _context.Posts.ToListAsync();
             //Map Final Data
-            return posts.Select(p => MapToResponseDto(p, _config));
+            return posts.Select(p => p.ToResponseDto(_config));
+        }
+
+        /*
+        * Find - Get a single Item by ID
+        */
+        public async Task<PostResponseDto?> Find(int id)
+        {
+            var post = await _context.Posts.FindAsync(id);
+            if (post == null) return null;
+
+            //Map DTO
+            return post?.ToResponseDto(_config);
         }
 
         /*
@@ -78,7 +74,7 @@ namespace WebApplication1.Services
                 await _context.SaveChangesAsync();
 
                 //Map Final Data
-                return MapToResponseDto(post, _config);
+                return post.ToResponseDto(_config);
             }
             catch (Exception ex)
             {
@@ -93,18 +89,7 @@ namespace WebApplication1.Services
             }
         }
 
-        /*
-         * Find - Get a single Item by ID
-         */
-        public async Task<PostResponseDto?> Find(int id)
-        {
-            var post = await _context.Posts.FindAsync(id);
-            if (post == null) return null;
-
-            //Map DTO
-            return MapToResponseDto(post, _config);
-        }
-
+       
         /*
         * Update an Item
         */
@@ -138,7 +123,7 @@ namespace WebApplication1.Services
                     await _storageService.DeleteFileAsync(oldRelativePath, _containerName);
                 }
 
-                return MapToResponseDto(post, _config);
+                return post.ToResponseDto(_config);
             }
             catch (Exception ex)
             {
