@@ -6,11 +6,16 @@ namespace WebApplication1.Controllers
     [Route("/")]
     public class HomeController : Controller
     {
-       
+        private readonly IWebHostEnvironment _env;
+
+        public HomeController(IWebHostEnvironment env)
+        {
+            _env = env;
+        }
+
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-           
             string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Home");
 
             string htmlContent = await System.IO.File.ReadAllTextAsync(Path.Combine(folderPath, "index.html"));
@@ -18,7 +23,9 @@ namespace WebApplication1.Controllers
 
             string finalHtml = htmlContent.Replace("{{STYLES}}", cssContent);
 
-           
+            //Set Enviroment
+            finalHtml = finalHtml.Replace("STAGING", _env.EnvironmentName.ToUpper());
+
             return Content(finalHtml, "text/html", System.Text.Encoding.UTF8);
         }
     }
