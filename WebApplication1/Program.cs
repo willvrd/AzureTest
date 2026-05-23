@@ -6,13 +6,13 @@
 // -----------------------------------------------------------------------------
 
 
+using Asp.Versioning; // Added for API Versioning
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
 using WebApplication1.Modules.Core.Middlewares.Handlers;
 using WebApplication1.Modules.Media.Services.Interfaces;
 using WebApplication1.Modules.Posts.Services;
 using WebApplication1.Modules.Posts.Services.Interfaces;
-using Asp.Versioning; // Added for API Versioning
 
 var builder = WebApplication.CreateBuilder(args);
 

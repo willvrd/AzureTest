@@ -15,7 +15,7 @@ namespace WebApplication1.Modules.Core.Controllers
 
         public async Task<IActionResult> Index()
         {
-           
+
             string folderPath = Path.Combine(
                 Directory.GetCurrentDirectory(),
                 "Modules",
