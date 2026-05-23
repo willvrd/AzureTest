@@ -5,10 +5,10 @@
 // Repository:  https://github.com/willvrd/AzureTest
 // -----------------------------------------------------------------------------
 
-using WebApplication1.DTOs.Post;
-using WebApplication1.Entities;
+using WebApplication1.Modules.Posts.DTOs.Post;
+using WebApplication1.Modules.Posts.Entities;
 
-namespace WebApplication1.Extensions
+namespace WebApplication1.Modules.Posts.Extensions
 {
     public static class PostExtension
     {

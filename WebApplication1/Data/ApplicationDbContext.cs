@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WebApplication1.Entities;
+using WebApplication1.Modules.Posts.Entities;
 
 namespace WebApplication1.Data
 {

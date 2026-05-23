@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace WebApplication1.Controllers
+namespace WebApplication1.Modules.Core.Controllers
 {
     [ApiController]
     [Route("/")]
@@ -13,17 +13,23 @@ namespace WebApplication1.Controllers
             _env = env;
         }
 
-        [HttpGet]
         public async Task<IActionResult> Index()
         {
-            string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Home");
+           
+            string folderPath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "Modules",
+                "Core",
+                "Templates",
+                "Home"
+            );
 
             string htmlContent = await System.IO.File.ReadAllTextAsync(Path.Combine(folderPath, "index.html"));
             string cssContent = await System.IO.File.ReadAllTextAsync(Path.Combine(folderPath, "styles.css"));
 
             string finalHtml = htmlContent.Replace("{{STYLES}}", cssContent);
 
-            //Set Enviroment
+            // Set Environment
             finalHtml = finalHtml.Replace("STAGING", _env.EnvironmentName.ToUpper());
 
             return Content(finalHtml, "text/html", System.Text.Encoding.UTF8);

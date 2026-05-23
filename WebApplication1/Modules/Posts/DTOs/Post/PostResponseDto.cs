@@ -1,4 +1,4 @@
-﻿namespace WebApplication1.DTOs.Post
+﻿namespace WebApplication1.Modules.Posts.DTOs.Post
 {
     public class PostResponseDto : PostBaseDto
     {

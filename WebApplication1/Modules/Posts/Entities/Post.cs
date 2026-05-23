@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace WebApplication1.Entities
+namespace WebApplication1.Modules.Posts.Entities
 {
     [Table("Posts")]
     public class Post

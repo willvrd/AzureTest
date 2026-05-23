@@ -1,6 +1,6 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using WebApplication1.Services.Interfaces;
+using WebApplication1.Modules.Media.Services.Interfaces;
 
 public class BlobStorageService : IStorageService
 {

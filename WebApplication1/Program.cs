@@ -8,9 +8,10 @@
 
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
-using WebApplication1.Middlewares.Handlers;
-using WebApplication1.Services;
-using WebApplication1.Services.Interfaces;
+using WebApplication1.Modules.Core.Middlewares.Handlers;
+using WebApplication1.Modules.Media.Services.Interfaces;
+using WebApplication1.Modules.Posts.Services;
+using WebApplication1.Modules.Posts.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 

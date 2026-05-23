@@ -1,4 +1,4 @@
-﻿namespace WebApplication1.Services.Interfaces
+﻿namespace WebApplication1.Modules.Media.Services.Interfaces
 {
     public interface IStorageService
     {
