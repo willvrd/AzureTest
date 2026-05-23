@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
+using WebApplication1.DTOs.Common;
 using WebApplication1.DTOs.Post;
 using WebApplication1.Entities;
 using WebApplication1.Extensions;
@@ -20,20 +21,29 @@ namespace WebApplication1.Controllers
         }
 
         /*
-         * Index
-         */
+        * Index | Pagination (Optional)
+        */
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PostResponseDto>>> Index()
+        public async Task<ActionResult<PagedResponse<PostResponseDto>>> Index(
+        [FromQuery] int? pageNumber = null,
+        [FromQuery] int? pageSize = null,
+        [FromQuery] string orderField = "id",
+        [FromQuery] string orderWay = "desc")
         {
-            var posts = await _postService.Index();
-            return Ok(posts); //200
+            // Sanitize pagination if present
+            if (pageNumber.HasValue) pageNumber = pageNumber < 1 ? 1 : pageNumber;
+            if (pageSize.HasValue) pageSize = pageSize > 50 ? 50 : pageSize;
+
+            var pagedData = await _postService.Index(pageNumber, pageSize, orderField, orderWay);
+
+            return Ok(pagedData);
         }
 
         /*
-         * Find
-         */
+        * Find
+        */
         [HttpGet("{id}")]
-        public async Task<ActionResult<PostResponseDto>> Find(int id)
+        public async Task<ActionResult<ResponseWrapper<PostResponseDto>>> Find(int id)
         {
             var post = await _postService.Find(id);
 
@@ -42,24 +52,27 @@ namespace WebApplication1.Controllers
                 return NotFound(new { message = $"Item with ID {id} was not found." });
             }
 
-            return Ok(post);
+            // Wrapped in Data object
+            return Ok(new ResponseWrapper<PostResponseDto>(post));
         }
 
         /*
         * Create
         */
         [HttpPost]
-        public async Task<ActionResult<PostResponseDto>> Create([FromForm] PostCreateDto postDto)
+        public async Task<ActionResult<ResponseWrapper<PostResponseDto>>> Create([FromForm] PostCreateDto postDto)
         {
             var response = await _postService.Create(postDto);
-            return CreatedAtAction(nameof(Index), new { id = response.Id }, response);
+
+            // Return with Data wrapper
+            return CreatedAtAction(nameof(Index), new { id = response.Id }, new ResponseWrapper<PostResponseDto>(response));
         }
 
         /*
         * Update
         */
         [HttpPut("{id}")]
-        public async Task<ActionResult<PostResponseDto>> Update(int id, [FromForm] PostUpdateDto postDto)
+        public async Task<ActionResult<ResponseWrapper<PostResponseDto>>> Update(int id, [FromForm] PostUpdateDto postDto)
         {
             var response = await _postService.Update(id, postDto);
 
@@ -68,7 +81,8 @@ namespace WebApplication1.Controllers
                 return NotFound(new { message = $"Item with ID {id} not found" });
             }
 
-            return Ok(response);
+            // Wrapped in Data object
+            return Ok(new ResponseWrapper<PostResponseDto>(response));
         }
 
         /*

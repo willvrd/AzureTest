@@ -7,6 +7,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
+using WebApplication1.DTOs.Common;
 using WebApplication1.DTOs.Post;
 using WebApplication1.Entities;
 using WebApplication1.Extensions;
@@ -31,15 +32,60 @@ namespace WebApplication1.Services
             _containerName = _config["BlobContainers:ContainerName"] ?? "images";
         }
 
-        
+
         /*
-         * Index - Get All Data
+         * Index - Pagination (Optional)
          */
-        public async Task<IEnumerable<PostResponseDto>> Index()
+        public async Task<PagedResponse<PostResponseDto>> Index(
+            int? pageNumber = null,
+            int? pageSize = null,
+            string orderField = "id",
+            string orderWay = "desc")
         {
-            var posts = await _context.Posts.ToListAsync();
-            //Map Final Data
-            return posts.Select(p => p.ToResponseDto(_config));
+            var query = _context.Posts.AsQueryable();
+
+            // Normalize inputs to avoid casing issues
+            orderField = orderField?.ToLower() ?? "id";
+            orderWay = orderWay?.ToLower() ?? "desc";
+
+            bool isDescending = orderWay == "desc";
+
+            //Prevent SQL Injection
+            query = orderField switch
+            {
+                "title" => isDescending ? query.OrderByDescending(p => p.Title) : query.OrderBy(p => p.Title),
+                "createdAt" => isDescending ? query.OrderByDescending(p => p.CreatedAt) : query.OrderBy(p => p.CreatedAt),
+                "updatedAt" => isDescending ? query.OrderByDescending(p => p.UpdatedAt) : query.OrderBy(p => p.UpdatedAt),
+                _ => isDescending ? query.OrderByDescending(p => p.Id) : query.OrderBy(p => p.Id) // Default fallback (Id)
+            };
+
+            //Get total count (after sorting setup, but before execution)
+            var totalRecords = await query.CountAsync();
+
+            List<Post> posts;
+
+            //Check if pagination is requested
+            if (pageNumber.HasValue && pageSize.HasValue)
+            {
+                posts = await query
+                    .Skip((pageNumber.Value - 1) * pageSize.Value)
+                    .Take(pageSize.Value)
+                    .ToListAsync();
+            }
+            else
+            {
+                // Return all data (already sorted) if no pagination parameters are provided
+                posts = await query.ToListAsync();
+
+                // Adjust pageNumber and pageSize for the response metadata
+                pageNumber = 1;
+                pageSize = totalRecords == 0 ? 1 : totalRecords; // Avoid 0 pageSize
+            }
+
+            var postsDto = posts.Select(p => p.ToResponseDto(_config));
+
+            // Final response
+            return new PagedResponse<PostResponseDto>(postsDto, pageNumber.Value, pageSize.Value, totalRecords);
         }
 
         /*
