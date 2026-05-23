@@ -12,23 +12,37 @@ using WebApplication1.Modules.Core.Middlewares.Handlers;
 using WebApplication1.Modules.Media.Services.Interfaces;
 using WebApplication1.Modules.Posts.Services;
 using WebApplication1.Modules.Posts.Services.Interfaces;
+using Asp.Versioning; // Added for API Versioning
 
 var builder = WebApplication.CreateBuilder(args);
 
-//Check Enviroment
+// Check Environment
 var env = builder.Environment.EnvironmentName;
-Console.WriteLine($"*** ENVIROMENT: {env} ***");
+Console.WriteLine($"*** ENVIRONMENT: {env} ***");
 
 // Add services to the container.
-
 builder.Services.AddControllers();
+
+// Configure API Versioning
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true; // Uses v1 if no version is provided in URL
+    options.ReportApiVersions = true;                  // Adds version info to headers (api-supported-versions)
+})
+.AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";                // Formats the version group as 'v1', 'v1.1', etc.
+    options.SubstituteApiVersionInUrl = true;          // Automatically maps the route parameter
+});
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 // IMPORTANTE: Agregar ProblemDetails primero | Exception Global Handler
 builder.Services.AddProblemDetails();
 
-//Registrar Exceptions | Exception Global Handler
+// Registrar Exceptions | Exception Global Handler
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 // Obtener la cadena de conexión de appsettings.json
@@ -45,7 +59,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
             errorNumbersToAdd: null);
     }));
 
-//Services
+// Services
 builder.Services.AddScoped<IStorageService, BlobStorageService>();
 builder.Services.AddScoped<IPostService, PostService>();
 
@@ -57,7 +71,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
     app.MapOpenApi();
 }
 
-//Exception Global Handler
+// Exception Global Handler
 app.UseExceptionHandler();
 
 app.UseHttpsRedirection();

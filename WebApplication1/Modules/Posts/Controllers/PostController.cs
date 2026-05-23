@@ -1,16 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
-using WebApplication1.Modules.Posts.Entities;
-using WebApplication1.Modules.Posts.Extensions;
 using WebApplication1.Modules.Posts.DTOs.Common;
 using WebApplication1.Modules.Posts.DTOs.Post;
+using WebApplication1.Modules.Posts.Entities;
+using WebApplication1.Modules.Posts.Extensions;
 using WebApplication1.Modules.Posts.Services.Interfaces;
 
 namespace WebApplication1.Modules.Posts.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class PostsController : ControllerBase
     {
         private readonly IPostService _postService;
