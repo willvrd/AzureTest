@@ -17,6 +17,13 @@ namespace WebApplication1.Modules.Posts.Entities
         [Required(ErrorMessage = "El content es obligatorio.")]
         public string Content { get; set; } = string.Empty;
 
+        
+        [MaxLength(250)]
+        public string Slug { get; set; } = string.Empty;
+
+        [Required]
+        public int SortOrder { get; set; } = 0;
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public bool IsPublished { get; set; } = false;
