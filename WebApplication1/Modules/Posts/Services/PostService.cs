@@ -4,7 +4,6 @@
 // License:     MIT
 // Repository:  https://github.com/willvrd/AzureTest
 // -----------------------------------------------------------------------------
-
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
 using WebApplication1.Modules.Media.Services.Interfaces;
@@ -13,59 +12,63 @@ using WebApplication1.Modules.Posts.DTOs.Post;
 using WebApplication1.Modules.Posts.Entities;
 using WebApplication1.Modules.Posts.Extensions;
 using WebApplication1.Modules.Posts.Services.Interfaces;
+using WebApplication1.Core.Extensions;
 
 namespace WebApplication1.Modules.Posts.Services
 {
     public class PostService : IPostService
     {
         private readonly ApplicationDbContext _context;
-        private readonly ILogger<PostService> _logger; //Logger with PostService
+        private readonly ILogger<PostService> _logger;
         private readonly IStorageService _storageService;
         private readonly IConfiguration _config;
         private readonly string _containerName;
 
-        public PostService(ApplicationDbContext context, IStorageService storageService, IConfiguration config)
+       
+        public PostService(ApplicationDbContext context, IStorageService storageService, IConfiguration config, ILogger<PostService> logger)
         {
             _context = context;
             _storageService = storageService;
             _config = config;
+            _logger = logger;
 
             _containerName = _config["BlobContainers:ContainerName"] ?? "images";
         }
 
-
         /*
-         * Index - Pagination (Optional)
+         * Index - Pagination (Optional) con soporte para SortOrder y Slug
          */
         public async Task<PagedResponse<PostResponseDto>> Index(
             int? pageNumber = null,
             int? pageSize = null,
-            string orderField = "id",
-            string orderWay = "desc")
+            string orderField = "sortorder",
+            string orderWay = "asc")
         {
             var query = _context.Posts.AsQueryable();
 
             // Normalize inputs to avoid casing issues
-            orderField = orderField?.ToLower() ?? "id";
-            orderWay = orderWay?.ToLower() ?? "desc";
+            orderField = orderField?.ToLower() ?? "sortorder";
+            orderWay = orderWay?.ToLower() ?? "asc";
 
             bool isDescending = orderWay == "desc";
 
-            //Prevent SQL Injection
+            // Prevent SQL Injection
             query = orderField switch
             {
+                "sortorder" => isDescending ? query.OrderByDescending(p => p.SortOrder) : query.OrderBy(p => p.SortOrder),
                 "title" => isDescending ? query.OrderByDescending(p => p.Title) : query.OrderBy(p => p.Title),
-                "createdAt" => isDescending ? query.OrderByDescending(p => p.CreatedAt) : query.OrderBy(p => p.CreatedAt),
-                "updatedAt" => isDescending ? query.OrderByDescending(p => p.UpdatedAt) : query.OrderBy(p => p.UpdatedAt),
+                "slug" => isDescending ? query.OrderByDescending(p => p.Slug) : query.OrderBy(p => p.Slug),
+                "createdat" => isDescending ? query.OrderByDescending(p => p.CreatedAt) : query.OrderBy(p => p.CreatedAt),
+                "updatedat" => isDescending ? query.OrderByDescending(p => p.UpdatedAt) : query.OrderBy(p => p.UpdatedAt),
                 _ => isDescending ? query.OrderByDescending(p => p.Id) : query.OrderBy(p => p.Id) // Default fallback (Id)
             };
 
-            //Get total count (after sorting setup, but before execution)
+            // Get total count (after sorting setup, but before execution)
             var totalRecords = await query.CountAsync();
 
             List<Post> posts;
 
-            //Check if pagination is requested
+            // Check if pagination is requested
             if (pageNumber.HasValue && pageSize.HasValue)
             {
                 posts = await query
@@ -97,8 +100,8 @@ namespace WebApplication1.Modules.Posts.Services
             var post = await _context.Posts.FindAsync(id);
             if (post == null) return null;
 
-            //Map DTO
-            return post?.ToResponseDto(_config);
+            // Map DTO
+            return post.ToResponseDto(_config);
         }
 
         /*
@@ -119,6 +122,8 @@ namespace WebApplication1.Modules.Posts.Services
                 {
                     Title = postDto.Title,
                     Content = postDto.Content,
+                    Slug = postDto.Title.ToSlug(),       
+                    SortOrder = postDto.SortOrder,
                     ImageRelativePath = relativePath,
                     CreatedAt = DateTime.UtcNow,
                     IsPublished = false
@@ -127,7 +132,7 @@ namespace WebApplication1.Modules.Posts.Services
                 _context.Posts.Add(post);
                 await _context.SaveChangesAsync();
 
-                //Map Final Data
+                // Map Final Data
                 return post.ToResponseDto(_config);
             }
             catch (Exception ex)
@@ -143,7 +148,6 @@ namespace WebApplication1.Modules.Posts.Services
             }
         }
 
-
         /*
         * Update an Item
         */
@@ -153,26 +157,28 @@ namespace WebApplication1.Modules.Posts.Services
             if (post == null) return null;
 
             string? newRelativePath = null;
-            string? oldRelativePath = post.ImageRelativePath; //Save Old
+            string? oldRelativePath = post.ImageRelativePath; // Save Old
 
             try
             {
-                //New Image
+                // New Image
                 if (postDto.Image != null && postDto.Image.Length > 0)
                 {
                     newRelativePath = await _storageService.UploadFileAsync(postDto.Image, _containerName, "posts");
                     post.ImageRelativePath = newRelativePath;
                 }
 
-                //Update Attributes
+                // Update Attributes
                 post.Title = postDto.Title;
                 post.Content = postDto.Content;
+                post.Slug = postDto.Title.ToSlug();       
+                post.SortOrder = postDto.SortOrder;       
                 post.UpdatedAt = DateTime.UtcNow;
 
                 _context.Posts.Update(post);
                 await _context.SaveChangesAsync();
 
-                //Delete Old Image
+                // Delete Old Image
                 if (newRelativePath != null && !string.IsNullOrEmpty(oldRelativePath))
                 {
                     await _storageService.DeleteFileAsync(oldRelativePath, _containerName);
@@ -182,7 +188,7 @@ namespace WebApplication1.Modules.Posts.Services
             }
             catch (Exception ex)
             {
-                //ROLLBACK: Si la BD falla pero ya habíamos subido la imagen nueva, la borramos
+                // ROLLBACK: Si la BD falla pero ya habíamos subido la imagen nueva, la borramos
                 if (!string.IsNullOrEmpty(newRelativePath))
                 {
                     await _storageService.DeleteFileAsync(newRelativePath, _containerName);
@@ -198,7 +204,7 @@ namespace WebApplication1.Modules.Posts.Services
         */
         public async Task<bool> Delete(int id)
         {
-            //Search Post
+            // Search Post
             var post = await _context.Posts.FindAsync(id);
 
             if (post == null) return false;
@@ -210,7 +216,7 @@ namespace WebApplication1.Modules.Posts.Services
                 _context.Posts.Remove(post);
                 await _context.SaveChangesAsync();
 
-                //Delete File
+                // Delete File
                 if (!string.IsNullOrEmpty(imagePath))
                 {
                     await _storageService.DeleteFileAsync(imagePath, _containerName);
@@ -224,6 +230,5 @@ namespace WebApplication1.Modules.Posts.Services
                 throw; // GlobalExceptionHandler
             }
         }
-
     }
 }
