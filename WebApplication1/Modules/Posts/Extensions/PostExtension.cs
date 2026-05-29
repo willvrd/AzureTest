@@ -23,6 +23,8 @@ namespace WebApplication1.Modules.Posts.Extensions
                 Id = post.Id,
                 Title = post.Title,
                 Content = post.Content,
+                Slug = post.Slug,
+                SortOrder = post.SortOrder,
                 CreatedAt = post.CreatedAt,
                 UpdatedAt = post.UpdatedAt,
                 IsPublished = post.IsPublished,
