@@ -104,6 +104,34 @@ namespace WebApplication1.Modules.Posts.Services
             return post.ToResponseDto(_config);
         }
 
+        /* 
+         * Find - Get a single Item by dynamic criteria (ID or Slug) 
+         */
+        public async Task<PostResponseDto?> FindByCriteria(string value, string field)
+        {
+            Post? post = null;
+
+            string searchField = field.ToLower().Trim();
+
+            if (searchField == "slug")
+            {
+                post = await _context.Posts
+                    .FirstOrDefaultAsync(p => p.Slug == value.Trim());
+            }
+            else // "id" default
+            {
+                if (int.TryParse(value, out int id))
+                {
+                    post = await _context.Posts.FindAsync(id);
+                }
+            }
+
+            if (post == null) return null;
+
+            // Map DTO
+            return post.ToResponseDto(_config);
+        }
+
         /*
         * Create an Item
         */

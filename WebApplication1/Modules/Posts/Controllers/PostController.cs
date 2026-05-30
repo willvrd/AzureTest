@@ -37,20 +37,28 @@ namespace WebApplication1.Modules.Posts.Controllers
             return Ok(pagedData);
         }
 
+        
+
         /*
-        * Find
-        */
-        [HttpGet("{id}")]
-        public async Task<ActionResult<ResponseWrapper<PostResponseDto>>> Find(int id)
+         * Find by dynamic criteria
+         */
+        [HttpGet("{value}")]          
+        public async Task<ActionResult<ResponseWrapper<PostResponseDto>>> Find(string value, [FromQuery] string field = "id")
         {
-            var post = await _postService.Find(id);
+           
+            //Validation not int
+            if (field == "id" && !int.TryParse(value, out _))
+            {
+                field = "slug";
+            }
+
+            var post = await _postService.FindByCriteria(value, field);
 
             if (post == null)
             {
-                return NotFound(new { message = $"Item with ID {id} was not found." });
+                return NotFound(new { message = $"Item with {field} '{value}' was not found." });
             }
 
-            // Wrapped in Data object
             return Ok(new ResponseWrapper<PostResponseDto>(post));
         }
 
