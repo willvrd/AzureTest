@@ -8,7 +8,7 @@ namespace WebApplication1.Modules.Posts.Controllers
 {
     [ApiController]
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/[controller]")]
+    [Route("api/v{version:apiVersion}/blog/[controller]")]
     public class PostsController : ControllerBase
     {
         private readonly IPostService _postService;
