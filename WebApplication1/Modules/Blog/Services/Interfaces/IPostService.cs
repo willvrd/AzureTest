@@ -1,7 +1,7 @@
-﻿using WebApplication1.Modules.Posts.DTOs.Common;
-using WebApplication1.Modules.Posts.DTOs.Post;
+﻿using WebApplication1.Modules.Blog.Posts.DTOs.Common;
+using WebApplication1.Modules.Blog.Posts.DTOs.Post;
 
-namespace WebApplication1.Modules.Posts.Services.Interfaces
+namespace WebApplication1.Modules.Blog.Posts.Services.Interfaces
 {
     public interface IPostService
     {

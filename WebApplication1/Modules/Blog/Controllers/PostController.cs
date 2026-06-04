@@ -1,10 +1,10 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
-using WebApplication1.Modules.Posts.DTOs.Common;
-using WebApplication1.Modules.Posts.DTOs.Post;
-using WebApplication1.Modules.Posts.Services.Interfaces;
+using WebApplication1.Modules.Blog.Posts.DTOs.Common;
+using WebApplication1.Modules.Blog.Posts.DTOs.Post;
+using WebApplication1.Modules.Blog.Posts.Services.Interfaces;
 
-namespace WebApplication1.Modules.Posts.Controllers
+namespace WebApplication1.Modules.Blog.Posts.Controllers
 {
     [ApiController]
     [ApiVersion("1.0")]

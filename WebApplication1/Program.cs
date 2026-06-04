@@ -8,10 +8,10 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
+using WebApplication1.Modules.Blog.Posts.Services;
+using WebApplication1.Modules.Blog.Posts.Services.Interfaces;
 using WebApplication1.Modules.Core.Middlewares.Handlers;
 using WebApplication1.Modules.Media.Services.Interfaces;
-using WebApplication1.Modules.Posts.Services;
-using WebApplication1.Modules.Posts.Services.Interfaces;
 using WebApplication1.Modules.Users.Entities;
 using WebApplication1.Modules.Users.Seeders;
 
@@ -21,7 +21,7 @@ var builder = WebApplication.CreateBuilder(args);
 // CONFIGURACIÓN DEL ENTORNO
 //=============================================================================
 var env = builder.Environment.EnvironmentName;
-Console.WriteLine($"*** ENVIRONMENT: {env} ***");
+Console.WriteLine($"\n*** ENVIRONMENT: {env} ***\n");
 
 //=============================================================================
 // SERVICIOS BASE DEL CONTENEDOR

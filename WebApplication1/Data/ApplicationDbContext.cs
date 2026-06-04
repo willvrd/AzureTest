@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
-using WebApplication1.Modules.Posts.Entities;
+using WebApplication1.Modules.Blog.Posts.Entities;
 using WebApplication1.Modules.Users.Entities;
 
 namespace WebApplication1.Data

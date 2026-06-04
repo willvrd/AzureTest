@@ -7,14 +7,14 @@
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
 using WebApplication1.Modules.Media.Services.Interfaces;
-using WebApplication1.Modules.Posts.DTOs.Common;
-using WebApplication1.Modules.Posts.DTOs.Post;
-using WebApplication1.Modules.Posts.Entities;
-using WebApplication1.Modules.Posts.Extensions;
-using WebApplication1.Modules.Posts.Services.Interfaces;
+using WebApplication1.Modules.Blog.Posts.DTOs.Common;
+using WebApplication1.Modules.Blog.Posts.DTOs.Post;
+using WebApplication1.Modules.Blog.Posts.Entities;
+using WebApplication1.Modules.Blog.Posts.Extensions;
+using WebApplication1.Modules.Blog.Posts.Services.Interfaces;
 using WebApplication1.Core.Extensions;
 
-namespace WebApplication1.Modules.Posts.Services
+namespace WebApplication1.Modules.Blog.Posts.Services
 {
     public class PostService : IPostService
     {

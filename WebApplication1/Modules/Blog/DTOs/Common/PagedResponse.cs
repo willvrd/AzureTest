@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace WebApplication1.Modules.Posts.DTOs.Common
+namespace WebApplication1.Modules.Blog.Posts.DTOs.Common
 {
     public class PagedResponse<T> : ResponseWrapper<IEnumerable<T>>
     {
